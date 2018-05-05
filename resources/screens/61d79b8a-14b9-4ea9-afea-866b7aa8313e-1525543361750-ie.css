@@ -1,0 +1,25 @@
+#s-61d79b8a-14b9-4ea9-afea-866b7aa8313e #s-Rectangle_1 {
+  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=23);
+  filter: alpha(opacity=23);
+  -ms-transform: rotate(0.0deg);
+}
+#s-61d79b8a-14b9-4ea9-afea-866b7aa8313e #s-Text_1 {
+  -ms-transform: rotate(0.0deg);
+}
+#s-61d79b8a-14b9-4ea9-afea-866b7aa8313e #s-Image_1 {
+  -ms-transform: rotate(0.0deg);
+}
+#s-61d79b8a-14b9-4ea9-afea-866b7aa8313e #s-Paragraph_1 {
+  -ms-transform: rotate(0.0deg);
+}
+#jim-container .ui-page {
+  overflow-x: hidden;
+}
+.non_jim_mobile #simulation {
+  overflow-x: hidden;
+}
+#s-61d79b8a-14b9-4ea9-afea-866b7aa8313e > #loadMark {
+  width: 1px;
+  visibility: hidden;
+  display: none;
+}
