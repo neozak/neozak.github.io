@@ -46,7 +46,13 @@ body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17p
 .gnav{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;height:48px;display:flex;align-items:center;justify-content:center;background:var(--nav);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--hair);padding-inline:16px}
 .gnav-in{width:100%;max-width:948px;display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:-.01em}
 .gnav b{font-family:var(--display);font-size:21px;font-weight:600;letter-spacing:.011em}
-.gnav span{color:var(--muted)}
+.gnav-r{display:flex;align-items:center;gap:14px}
+.gnav-towns{color:var(--muted)}
+@media (max-width:420px){.gnav-towns{display:none}}
+.favnav{display:inline-flex;align-items:center;gap:6px;border:0;background:var(--hair);color:var(--ink);font:600 14px var(--body);border-radius:999px;padding:6px 12px;cursor:pointer;transition:background-color 200ms ease,color 200ms ease}
+.favnav svg{width:16px;height:16px;flex:none}
+.favnav[aria-pressed="true"]{background:var(--hot);color:#fff}
+.favnav[aria-pressed="true"] svg{fill:currentColor}
 
 .wrap{max-width:980px;margin:0 auto;padding-inline:16px;padding-block:0 80px;display:flex;flex-direction:column;gap:56px}
 
@@ -228,7 +234,7 @@ footer a{color:var(--link);text-decoration:none}
 </div>
 <div class="toast" id="toast" role="status" hidden></div>
 
-<nav class="gnav" aria-label="Pisos"><div class="gnav-in"><b>Pisos</b><span>Blanes · Palafolls · Badalona</span></div></nav>
+<nav class="gnav" aria-label="Pisos"><div class="gnav-in"><b>Pisos</b><div class="gnav-r"><span class="gnav-towns">Blanes · Palafolls · Badalona</span><button class="favnav" id="favnav" type="button" aria-pressed="false" aria-label="Ver mis favoritos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg><span class="num" id="favnav-n">0</span></button></div></div></nav>
 
 <div class="wrap">
   <header>
@@ -472,7 +478,7 @@ function flatHTML(l, i){
 
 function renderFeed(){
   const feed = $('feed');
-  $('feed-title').textContent = S.mode === 'venta' ? 'Pisos en venta' : 'Pisos en alquiler';
+  $('feed-title').textContent = (S.fav ? 'Tus favoritos' : 'Pisos') + (S.mode === 'venta' ? ' en venta' : ' en alquiler');
   if(dbState === 'loading'){ feed.innerHTML = '<div class="empty"><b>Cargando pisos…</b></div>'; $('count').textContent = ''; return; }
   if(dbState === 'off'){ feed.innerHTML = '<div class="empty"><b>No se pueden cargar los pisos aquí</b><span>Vuelve a cargar la página.</span></div>'; $('count').textContent = ''; return; }
   const list = visible();
@@ -510,6 +516,9 @@ function renderStats(){
   put('s-venta', live.filter(l => l.op === 'venta').length);
   put('s-alquiler', live.filter(l => l.op === 'alquiler').length);
   put('s-bajadas', live.filter(l => drop(l) > 0).length);
+  $('favnav-n').textContent = LISTINGS.filter(l => l.marca === 'fav').length;
+  $('favnav').setAttribute('aria-pressed', String(!!S.fav));
+  $('favnav').setAttribute('aria-label', S.fav ? 'Ver todos los pisos' : 'Ver mis favoritos');
   for(const n of document.querySelectorAll('#towns [data-n]')){
     const t = n.dataset.n;
     n.textContent = dbState === 'ok' ? LISTINGS.filter(l => baseMatch(l) && (!t || l.municipio === t)).length : '';
@@ -710,6 +719,16 @@ $('f-m2').addEventListener('input', e => { S.m2 = +e.target.value || 0; save(); 
 $('f-rooms').addEventListener('change', e => { S.rooms = +e.target.value; refresh(); });
 $('f-sort').addEventListener('change', e => { S.sort = e.target.value; refresh(); });
 $('f-fav').addEventListener('change', e => { S.fav = e.target.checked; refresh(); });
+// Star in the top bar: jump straight to the favorites (switching to venta/alquiler if they are all in the other one).
+$('favnav').addEventListener('click', () => {
+  if(S.fav){ S.fav = false; refresh(); return; }
+  S.fav = true; S.town = '';
+  const favs = LISTINGS.filter(l => l.marca === 'fav');
+  if(favs.length && !favs.some(l => l.op === S.mode)) S.mode = favs[0].op;
+  refresh();
+  if(!favs.length) toast('Aún no tienes favoritos. Toca la estrella de un piso para guardarlo.');
+  $('feed-title').scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center'});
+});
 $('f-hide').addEventListener('change', e => { S.hide = e.target.checked; refresh(); });
 for(const k of ['terraza','ascensor','garaje']) $('x-' + k).addEventListener('change', e => { S[k] = e.target.checked; save(); renderCards(); });
 for(const id of ['c-price','c-m2','c-zone']) $(id).addEventListener('input', renderCalc);
