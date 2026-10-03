@@ -114,6 +114,16 @@ button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible,su
 .flat-head{display:flex;flex-direction:column;gap:6px}
 .flat-head > div{display:flex;flex-direction:column;gap:6px;min-width:0}
 .badge{display:block;font:600 13px var(--display);color:var(--hot)}
+.tags{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center}
+.tag{font:600 12px var(--display);border-radius:999px;padding:3px 10px;letter-spacing:0}
+.tag.new{background:var(--accent);color:var(--accent-ink)}
+.tag.down{background:var(--good-bg);color:var(--good)}
+.was{font:400 15px var(--body);color:var(--muted)}
+.topcard .was{color:var(--tile-muted)}
+.sync{display:flex;flex-direction:column;gap:12px}
+.sync-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.sync input{flex:1 1 240px;min-width:0;font:400 14px var(--body);color:var(--ink);background:var(--raised);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 24px);transform:translateX(-50%);z-index:60;background:var(--tile);color:var(--tile-ink);font-size:15px;padding:12px 20px;border-radius:999px;box-shadow:var(--lift);max-width:calc(100% - 32px)}
 .where{font-size:13px;color:var(--muted);letter-spacing:-.01em}
 .flat h3{margin:0;font-family:var(--display);font-weight:600;font-size:24px;line-height:1.17;letter-spacing:.009em;text-wrap:balance}
 .price{font-family:var(--display);font-weight:600;font-size:21px;line-height:1.2;white-space:nowrap;color:var(--ink);display:flex;align-items:baseline;gap:6px}
@@ -216,6 +226,7 @@ footer a{color:var(--link);text-decoration:none}
     <span class="err" id="lock-err" role="alert"></span>
   </form>
 </div>
+<div class="toast" id="toast" role="status" hidden></div>
 
 <nav class="gnav" aria-label="Pisos"><div class="gnav-in"><b>Pisos</b><span>Blanes · Palafolls · Badalona</span></div></nav>
 
@@ -225,10 +236,10 @@ footer a{color:var(--link);text-decoration:none}
     <h1>Tu próximo piso.<em>Venta y alquiler en Blanes, Palafolls y Badalona.</em></h1>
     <p class="updated" id="updated">Cargando la última búsqueda…</p>
     <div class="stats" id="stats" aria-label="Resumen">
-      <div class="stat"><b class="num" id="s-total">—</b><span>pisos en total</span></div>
-      <div class="stat"><b class="num" id="s-blanes">—</b><span>en Blanes</span></div>
-      <div class="stat"><b class="num" id="s-palafolls">—</b><span>en Palafolls</span></div>
-      <div class="stat"><b class="num" id="s-badalona">—</b><span>en Badalona</span></div>
+      <div class="stat"><b class="num" id="s-nuevos">—</b><span>nuevos hoy</span></div>
+      <div class="stat"><b class="num" id="s-venta">—</b><span>en venta</span></div>
+      <div class="stat"><b class="num" id="s-alquiler">—</b><span>en alquiler</span></div>
+      <div class="stat"><b class="num" id="s-bajadas">—</b><span>han bajado de precio</span></div>
     </div>
   </header>
 
@@ -259,7 +270,7 @@ footer a{color:var(--link);text-decoration:none}
             <select id="f-rooms"><option value="0">Cualquiera</option><option value="1">1 o más</option><option value="2">2 o más</option><option value="3">3 o más</option><option value="4">4 o más</option></select></label>
           <label class="field"><span class="label">Metros mínimos</span><input id="f-m2" type="number" inputmode="numeric" min="0" step="5" placeholder="Sin mínimo"></label>
           <label class="field"><span class="label">Ordenar</span>
-            <select id="f-sort"><option value="best">Mejor €/m² vs zona</option><option value="new">Más recientes</option><option value="cheap">Más baratos</option></select></label>
+            <select id="f-sort"><option value="best">Mejor €/m² vs zona</option><option value="new">Más recientes</option><option value="cheap">Más baratos</option><option value="drop">Bajadas de precio</option></select></label>
         </div>
         <div class="chips">
           <label class="chip"><input type="checkbox" id="f-fav"> Solo favoritos</label>
@@ -284,6 +295,18 @@ footer a{color:var(--link);text-decoration:none}
       </div>
       <p class="note">Los extras solo se aplican en Idealista. En Badalona venta, Idealista abre el barrio exacto; en los demás portales elige el barrio en sus filtros.</p>
       <div id="cards"></div>
+    </div>
+  </details>
+
+  <details class="tool" id="sync">
+    <summary><span>Tus favoritos en otro dispositivo<span class="sub">Pasa tus favoritos y descartados del móvil al ordenador, o al revés</span></span></summary>
+    <div class="tool-body sync">
+      <p class="note">Los favoritos se guardan en este navegador. Copia este enlace y ábrelo en el otro dispositivo: se añadirán allí los que marcaste aquí.</p>
+      <div class="sync-row">
+        <input id="sync-link" type="text" readonly aria-label="Enlace con tus favoritos">
+        <button class="btn main" type="button" id="sync-copy">Copiar enlace</button>
+      </div>
+      <span class="note" id="sync-note" aria-live="polite"></span>
     </div>
   </details>
 
@@ -351,6 +374,9 @@ const fmt = (n, d = 0) => n.toLocaleString('es-ES', {maximumFractionDigits: d, m
 const zoneById = id => ZONES.find(z => z.id === id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const safeUrl = u => /^https:\/\//.test(u || '') ? u : '';
+// "Nuevo": found in the latest morning search. Price drop: previous price stored by the daily task.
+function isNew(l){ return !!(INFORME && INFORME.fecha && l.encontrado === INFORME.fecha); }
+function drop(l){ return l.precioAnterior && l.precio && l.precioAnterior > l.precio ? l.precioAnterior - l.precio : 0; }
 const ICON = {
   star:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg>',
   x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
@@ -406,6 +432,7 @@ function visible(){
     best: (a, b) => (a.top || 99) - (b.top || 99) || (diffFor(a) ?? 999) - (diffFor(b) ?? 999),
     new: (a, b) => String(b.publicado || '').localeCompare(String(a.publicado || '')),
     cheap: (a, b) => (a.precio || 1e12) - (b.precio || 1e12),
+    drop: (a, b) => drop(b) - drop(a) || (b.publicado || '').localeCompare(a.publicado || ''),
   }[S.sort];
   return list.sort(by);
 }
@@ -422,11 +449,11 @@ function flatHTML(l, i){
   return `<article class="flat${firstPaint ? ' enter' : ''}${dis ? ' dim' : ''}" style="--i:${Math.min(i, 8)}">
     <div class="flat-head">
       <div>
-        ${l.top ? `<span class="badge">Top ${l.top} de hoy</span>` : ''}
+        ${(l.top || isNew(l) || drop(l)) ? `<div class="tags">${isNew(l) ? '<span class="tag new">Nuevo</span>' : ''}${drop(l) ? `<span class="tag down">Ha bajado ${fmt(drop(l))} €</span>` : ''}${l.top ? `<span class="badge">Top ${l.top} de hoy</span>` : ''}</div>` : ''}
         <div class="where">${esc(l.municipio)}${l.zona ? ' · ' + esc(l.zona) : ''}</div>
         <h3>${esc(l.titulo || 'Piso')}</h3>
       </div>
-      <div class="price">${l.precio ? fmt(l.precio) + ' €' : '—'}${rent ? '<small>al mes</small>' : ''}</div>
+      <div class="price">${l.precio ? fmt(l.precio) + ' €' : '—'}${rent ? '<small>al mes</small>' : ''}${drop(l) ? `<s class="was">${fmt(l.precioAnterior)} €</s>` : ''}</div>
     </div>
     ${facts ? `<div class="facts">${facts}</div>` : ''}
     ${p && a ? gaugeHTML(p, a, rent) : ''}
@@ -468,7 +495,7 @@ function renderTop(){
     const d = diffFor(l), url = safeUrl(l.url);
     return `<a class="topcard" href="${esc(url) || '#'}" target="_blank" rel="noopener">
       <span class="rank">Top ${l.top}</span>
-      <span class="p">${fmt(l.precio)} €</span>
+      <span class="p">${fmt(l.precio)} €${drop(l) ? ` <s class="was">${fmt(l.precioAnterior)} €</s>` : ''}</span>
       <span class="t">${esc(l.titulo)}</span>
       <span class="z">${esc(l.municipio)} · ${esc(l.zona || '')} · <span class="num">${fmt(l.m2)} m²</span></span>
       ${d != null ? `<span class="d">${verdictText(d)}</span>` : ''}
@@ -477,10 +504,12 @@ function renderTop(){
 }
 
 function renderStats(){
-  const inMode = LISTINGS.filter(l => l.op === S.mode && (!S.hide || l.marca !== 'descartado'));
-  const by = t => inMode.filter(l => l.municipio === t).length;
-  $('s-total').textContent = dbState === 'ok' ? inMode.length : '—';
-  for(const t of ['Blanes','Palafolls','Badalona']) $('s-' + t.toLowerCase()).textContent = dbState === 'ok' ? by(t) : '—';
+  const ok = dbState === 'ok', live = LISTINGS.filter(l => l.marca !== 'descartado');
+  const put = (id, n) => { $(id).textContent = ok ? n : '—'; };
+  put('s-nuevos', live.filter(isNew).length);
+  put('s-venta', live.filter(l => l.op === 'venta').length);
+  put('s-alquiler', live.filter(l => l.op === 'alquiler').length);
+  put('s-bajadas', live.filter(l => drop(l) > 0).length);
   for(const n of document.querySelectorAll('#towns [data-n]')){
     const t = n.dataset.n;
     n.textContent = dbState === 'ok' ? LISTINGS.filter(l => baseMatch(l) && (!t || l.municipio === t)).length : '';
@@ -507,6 +536,7 @@ document.addEventListener('click', async e => {
   l.marca = next;
   if(next) MARKS[l.id] = next; else delete MARKS[l.id];
   try{ localStorage.setItem('pisos-marcas', JSON.stringify(MARKS)); }catch(e){}
+  renderSync();
   renderData();
 });
 
@@ -515,6 +545,34 @@ function renderData(){ renderStats(); renderTop(); renderFeed(); if(dbState === 
 // Data is embedded in the page; favourites and dismissals live only in this browser
 let MARKS = {};
 try{ MARKS = JSON.parse(localStorage.getItem('pisos-marcas')) || {}; }catch(e){}
+// Favorites travel between devices in the link: #marcas=<base64url JSON>. Imported marks are added to this browser's.
+const b64u = t => btoa(unescape(encodeURIComponent(t))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const unb64u = t => decodeURIComponent(escape(atob(t.replace(/-/g, '+').replace(/_/g, '/'))));
+function toast(msg){ const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => { t.hidden = true; }, 3500); }
+(() => {
+  const m = location.hash.match(/^#marcas=([A-Za-z0-9_-]+)$/);
+  if(!m) return;
+  try{
+    const inc = JSON.parse(unb64u(m[1])); let n = 0;
+    for(const [id, v] of Object.entries(inc)) if(v === 'fav' || v === 'descartado'){ MARKS[id] = v; n++; }
+    localStorage.setItem('pisos-marcas', JSON.stringify(MARKS));
+    setTimeout(() => toast(n === 1 ? 'Se ha añadido 1 marca de tu otro dispositivo' : `Se han añadido ${n} marcas de tu otro dispositivo`), 300);
+  }catch(e){ setTimeout(() => toast('Este enlace de favoritos no es válido'), 300); }
+  history.replaceState(null, '', location.pathname + location.search);
+})();
+function syncLink(){ return location.origin + location.pathname + '#marcas=' + b64u(JSON.stringify(MARKS)); }
+function renderSync(){
+  const n = Object.keys(MARKS).length;
+  $('sync-link').value = n ? syncLink() : '';
+  $('sync-link').placeholder = 'Todavía no has marcado ningún piso';
+  $('sync-copy').disabled = !n;
+}
+$('sync-copy').addEventListener('click', async () => {
+  const link = syncLink();
+  try{ await navigator.clipboard.writeText(link); $('sync-note').textContent = 'Enlace copiado. Ábrelo en el otro dispositivo.'; }
+  catch(e){ $('sync-link').select(); $('sync-note').textContent = 'Selecciona el enlace y cópialo.'; }
+});
+renderSync();
 dbState = 'loading';
 const b64d = t => Uint8Array.from(atob(t), c => c.charCodeAt(0));
 let ENC = null;
