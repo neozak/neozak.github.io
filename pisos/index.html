@@ -173,9 +173,31 @@ footer a{color:var(--muted)}
   .flat{animation:none}
   *{transition-property:opacity,background-color,border-color,color!important}
 }
+.lock{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;background:var(--bg)}
+.lock form{width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px;padding:24px;border-radius:18px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);font-family:var(--body);color:var(--ink)}
+.lock h2{margin:0;font-family:var(--display);font-size:1.5rem}
+.lock p{margin:0;color:var(--muted);font-size:.95rem}
+.lock input[type=password]{font:inherit;font-size:1rem;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--raised);color:var(--ink)}
+.lock input[type=password]:focus{outline:2px solid var(--navy);outline-offset:1px}
+.lock label.rec{display:flex;gap:8px;align-items:center;font-size:.9rem;color:var(--muted)}
+.lock button{font:inherit;font-weight:600;padding:12px;border:0;border-radius:12px;background:var(--coral);color:#fff;cursor:pointer}
+.lock button:disabled{opacity:.6;cursor:wait}
+.lock .err{color:var(--bad);font-size:.9rem;min-height:1.2em}
 </style>
 </head>
 <body>
+<div class="lock" id="lock">
+  <form id="lock-form" autocomplete="on">
+    <div class="awning" aria-hidden="true"></div>
+    <h2>Pisos de Zakaria</h2>
+    <p>Escribe la contraseña para ver los pisos.</p>
+    <input type="text" name="username" value="pisos" autocomplete="username" hidden>
+    <input type="password" id="lock-pass" autocomplete="current-password" placeholder="Contraseña" required>
+    <label class="rec"><input type="checkbox" id="lock-rec" checked> Recordar en este dispositivo</label>
+    <button type="submit" id="lock-btn">Entrar</button>
+    <span class="err" id="lock-err" role="alert"></span>
+  </form>
+</div>
 
 <div class="wrap">
   <div class="awning" aria-hidden="true"></div>
@@ -475,15 +497,41 @@ function renderData(){ renderStats(); renderTop(); renderFeed(); if(dbState === 
 let MARKS = {};
 try{ MARKS = JSON.parse(localStorage.getItem('pisos-marcas')) || {}; }catch(e){}
 dbState = 'loading';
-fetch('pisos.json', {cache: 'no-store'})
-  .then(r => { if(!r.ok) throw new Error(r.status); return r.json(); })
-  .then(DATA => {
-    LISTINGS = (DATA.pisos || []).map(l => Object.assign({}, l, {marca: MARKS[l.id] || null}));
-    INFORME = DATA.informe || null;
-    dbState = 'ok';
-  })
-  .catch(() => { dbState = 'off'; })
-  .finally(() => { renderData(); renderInforme(); });
+const b64d = t => Uint8Array.from(atob(t), c => c.charCodeAt(0));
+let ENC = null;
+async function abrir(clave){
+  if(!ENC){ const r = await fetch('pisos.enc.json', {cache: 'no-store'}); if(!r.ok) throw new Error('red'); ENC = await r.json(); }
+  const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(clave), 'PBKDF2', false, ['deriveKey']);
+  const key = await crypto.subtle.deriveKey({name: 'PBKDF2', salt: b64d(ENC.salt), iterations: ENC.iter, hash: 'SHA-256'},
+    base, {name: 'AES-GCM', length: 256}, false, ['decrypt']);
+  let txt;
+  try{ txt = new TextDecoder().decode(await crypto.subtle.decrypt({name: 'AES-GCM', iv: b64d(ENC.iv)}, key, b64d(ENC.ct))); }
+  catch(e){ throw new Error('clave'); }
+  const DATA = JSON.parse(txt);
+  LISTINGS = (DATA.pisos || []).map(l => Object.assign({}, l, {marca: MARKS[l.id] || null}));
+  INFORME = DATA.informe || null;
+  dbState = 'ok';
+  $('lock').hidden = true;
+  renderData(); renderInforme();
+}
+$('lock-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const clave = $('lock-pass').value;
+  $('lock-btn').disabled = true; $('lock-err').textContent = '';
+  try{
+    await abrir(clave);
+    try{ if($('lock-rec').checked) localStorage.setItem('pisos-clave', clave); else localStorage.removeItem('pisos-clave'); }catch(e){}
+  }catch(err){
+    $('lock-err').textContent = err.message === 'clave' ? 'Contraseña incorrecta.' : 'No se pueden cargar los pisos. Vuelve a intentarlo.';
+    $('lock-pass').select();
+  }finally{ $('lock-btn').disabled = false; }
+});
+(async () => {
+  let guardada = null;
+  try{ guardada = localStorage.getItem('pisos-clave'); }catch(e){}
+  if(guardada){ try{ await abrir(guardada); return; }catch(e){ try{ localStorage.removeItem('pisos-clave'); }catch(_){} } }
+  $('lock-pass').focus();
+})();
 
 /* ---------- Portal links ---------- */
 const ROOMS = {1:'un-dormitorio', 2:'de-dos-dormitorios', 3:'de-tres-dormitorios', 4:'de-cuatro-cinco-habitaciones-o-mas'};
