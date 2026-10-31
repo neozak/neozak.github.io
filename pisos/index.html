@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pisos Maresme y Badalona</title>
-<meta name="description" content="Pisos en venta y alquiler en Blanes, Palafolls y Badalona, actualizados cada mañana.">
+<meta name="description" content="Pisos en venta y alquiler en Blanes, Lloret de Mar, Palafolls y Badalona, actualizados cada mañana.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&display=swap">
@@ -237,12 +237,12 @@ footer a{color:var(--link);text-decoration:none}
 </div>
 <div class="toast" id="toast" role="status" hidden></div>
 
-<nav class="gnav" aria-label="Pisos"><div class="gnav-in"><b>Pisos</b><div class="gnav-r"><span class="gnav-towns">Blanes · Palafolls · Badalona</span><button class="favnav" id="favnav" type="button" aria-pressed="false" aria-label="Ver mis favoritos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg><span class="num" id="favnav-n">0</span></button></div></div></nav>
+<nav class="gnav" aria-label="Pisos"><div class="gnav-in"><b>Pisos</b><div class="gnav-r"><span class="gnav-towns">Blanes · Lloret · Palafolls · Badalona</span><button class="favnav" id="favnav" type="button" aria-pressed="false" aria-label="Ver mis favoritos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg><span class="num" id="favnav-n">0</span></button></div></div></nav>
 
 <div class="wrap">
   <header>
     <span class="kicker">Nuevo cada mañana</span>
-    <h1>Tu próximo piso.<em>Venta y alquiler en Blanes, Palafolls y Badalona.</em></h1>
+    <h1>Tu próximo piso.<em>Venta y alquiler en Blanes, Lloret de Mar, Palafolls y Badalona.</em></h1>
     <p class="updated" id="updated">Cargando la última búsqueda…</p>
     <div class="search-now">
       <a class="btn main" id="search-now" href="https://claude.ai/" target="_blank" rel="noopener">Buscar ahora</a>
@@ -273,6 +273,7 @@ footer a{color:var(--link);text-decoration:none}
       <div class="towns" role="group" aria-label="Municipio" id="towns">
         <button class="chip" data-town="" aria-pressed="true">Todos <span class="n num" data-n=""></span></button>
         <button class="chip" data-town="Blanes" aria-pressed="false">Blanes <span class="n num" data-n="Blanes"></span></button>
+        <button class="chip" data-town="Lloret de Mar" aria-pressed="false">Lloret <span class="n num" data-n="Lloret de Mar"></span></button>
         <button class="chip" data-town="Palafolls" aria-pressed="false">Palafolls <span class="n num" data-n="Palafolls"></span></button>
         <button class="chip" data-town="Badalona" aria-pressed="false">Badalona <span class="n num" data-n="Badalona"></span></button>
       </div>
@@ -338,7 +339,7 @@ footer a{color:var(--link);text-decoration:none}
     </div>
   </details>
 
-  <footer>Los anuncios se actualizan cada mañana a partir de una búsqueda automática, sobre todo de yaencontre y Habitaclia, porque Idealista, Fotocasa y pisos.com no dejan leerlos de forma automática. Medias de €/m² de Indomio, agosto de 2026: <a href="https://www.indomio.es/mercado-inmobiliario/cataluna/blanes/" target="_blank" rel="noopener">Blanes</a>, <a href="https://www.indomio.es/mercado-inmobiliario/cataluna/palafolls/" target="_blank" rel="noopener">Palafolls</a>, <a href="https://www.indomio.es/mercado-inmobiliario/cataluna/badalona/" target="_blank" rel="noopener">Badalona</a>.</footer>
+  <footer>Los anuncios se actualizan cada mañana a partir de una búsqueda automática, sobre todo de yaencontre y Habitaclia, porque Idealista, Fotocasa y pisos.com no dejan leerlos de forma automática. Medias de €/m² de Indomio, agosto de 2026: <a href="https://www.indomio.es/mercado-inmobiliario/cataluna/blanes/" target="_blank" rel="noopener">Blanes</a>, <a href="https://www.indomio.es/mercado-inmobiliario/cataluna/lloret-de-mar/" target="_blank" rel="noopener">Lloret de Mar</a> (septiembre), <a href="https://www.indomio.es/mercado-inmobiliario/cataluna/palafolls/" target="_blank" rel="noopener">Palafolls</a>, <a href="https://www.indomio.es/mercado-inmobiliario/cataluna/badalona/" target="_blank" rel="noopener">Badalona</a>.</footer>
 </div>
 
 <script>
@@ -351,6 +352,7 @@ const ZONES = [
   {id:'blanes-florit', name:'Blanes · Mas Florit-Ca la Guidó', v:1990, a:10.79},
   {id:'blanes-mont', name:'Blanes · Mont-Ferrant-Sant Joan', v:2574, a:8.21},
   {id:'blanes-cala', name:'Blanes · Santa Cristina-La Cala', v:3938, a:7.58},
+  {id:'lloret', town:'Lloret de Mar', name:'Lloret de Mar (media)', v:2628, a:16.05},
   {id:'palafolls', town:'Palafolls', name:'Palafolls (media)', v:2269, a:10.06},
   {id:'badalona', town:'Badalona', name:'Badalona (media)', v:2688, a:18.39},
   {id:'bdn-salut', name:'Badalona · La Salut', v:2263, a:11.89},
@@ -362,6 +364,7 @@ const ZONES = [
 const AREAS = {
   venta: [
     {town:'Blanes', name:'Blanes', zone:'blanes', idealista:'blanes-girona', slug:'blanes'},
+    {town:'Lloret de Mar', name:'Lloret de Mar', zone:'lloret', idealista:'lloret-de-mar-girona', slug:'lloret-de-mar', us:'lloret_de_mar'},
     {town:'Palafolls', name:'Palafolls', zone:'palafolls', idealista:'palafolls-barcelona', slug:'palafolls'},
     {town:'Badalona', name:'Badalona · La Salut, Lloreda y Sistrells', zone:'bdn-sistrells', idealista:'badalona/la-salut-lloreda-sistrells', slug:'badalona'},
     {town:'Badalona', name:'Badalona · Gorg y Pep Ventura', zone:'bdn-gorg', idealista:'badalona/gorg-pep-ventura', slug:'badalona'},
@@ -369,6 +372,7 @@ const AREAS = {
   ],
   alquiler: [
     {town:'Blanes', name:'Blanes', zone:'blanes', idealista:'blanes-girona', slug:'blanes'},
+    {town:'Lloret de Mar', name:'Lloret de Mar', zone:'lloret', idealista:'lloret-de-mar-girona', slug:'lloret-de-mar', us:'lloret_de_mar'},
     {town:'Palafolls', name:'Palafolls', zone:'palafolls', idealista:'palafolls-barcelona', slug:'palafolls'},
     {town:'Badalona', name:'Badalona', zone:'badalona', idealista:'badalona-barcelona', slug:'badalona'},
   ]
@@ -646,8 +650,8 @@ function fotocasaURL(a){
   if(S.m2 > 0) q.set('minSurface', S.m2);
   return `https://www.fotocasa.es/es/${S.mode === 'venta' ? 'comprar' : 'alquiler'}/viviendas/${a.slug}/todas-las-zonas/l?${q}`;
 }
-const habitacliaURL = a => S.mode === 'venta' ? `https://www.habitaclia.com/viviendas-${a.slug}.htm` : `https://www.habitaclia.com/alquiler-${a.slug}.htm`;
-const pisosURL = a => `https://www.pisos.com/${S.mode}/pisos-${a.slug}/`;
+const habitacliaURL = a => S.mode === 'venta' ? `https://www.habitaclia.com/viviendas-${a.us || a.slug}.htm` : `https://www.habitaclia.com/alquiler-${a.us || a.slug}.htm`;
+const pisosURL = a => `https://www.pisos.com/${S.mode}/pisos-${a.us || a.slug}/`;
 const yaURL = a => `https://www.yaencontre.com/${S.mode}/pisos/${a.slug}/o-recientes`;
 
 function renderCards(){
