@@ -378,10 +378,17 @@ const AREAS = {
   ]
 };
 
-const DEFAULTS = {mode:'venta', town:'', price:{venta:0, alquiler:0}, rooms:0, m2:0, sort:'best', fav:false, hide:true, terraza:false, ascensor:false, garaje:false};
+const DEFAULTS = {mode:'venta', town:'', price:{venta:250000, alquiler:0}, rooms:0, m2:0, sort:'best', fav:false, hide:true, terraza:false, ascensor:false, garaje:false};
 let S = load();
 function load(){
-  try{ const s = JSON.parse(localStorage.getItem('pisos-filtros-v2')); if(s && s.price) return Object.assign({}, DEFAULTS, s); }catch(e){}
+  try{
+    const s = JSON.parse(localStorage.getItem('pisos-filtros-v2'));
+    if(s && s.price){
+      // Budget cap of 250.000 € (Oct 2026): apply once to saved filters that had no price limit
+      if(!localStorage.getItem('pisos-tope-250')){ if(!s.price.venta) s.price.venta = 250000; localStorage.setItem('pisos-tope-250', '1'); }
+      return Object.assign({}, DEFAULTS, s);
+    }
+  }catch(e){}
   return JSON.parse(JSON.stringify(DEFAULTS));
 }
 function save(){ try{ localStorage.setItem('pisos-filtros-v2', JSON.stringify(S)); }catch(e){} }
