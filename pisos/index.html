@@ -100,6 +100,8 @@ h2{font-family:var(--display);font-weight:700;font-size:clamp(28px,4.4vw,40px);l
 .chip input{accent-color:var(--accent);margin:0}
 .chip[aria-pressed="true"],.chip:has(input:checked){border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
 .chip .n{font-size:12px;color:var(--muted)}
+.chip .cap{font-size:12px;color:var(--accent);font-weight:600}
+.towns.sub .chip{font-size:13px;padding:5px 12px}
 .filter-btn{border:0;background:transparent;color:var(--link);font:400 15px var(--body);padding:6px 4px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
 .filter-btn .dot{min-width:20px;height:20px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-size:12px;display:inline-grid;place-items:center;padding-inline:6px}
 .filters{display:flex;flex-direction:column;gap:14px;padding:20px;background:var(--surface);border-radius:18px;transition:opacity 300ms var(--ease),transform 300ms var(--ease)}
@@ -237,12 +239,12 @@ footer a{color:var(--link);text-decoration:none}
 </div>
 <div class="toast" id="toast" role="status" hidden></div>
 
-<nav class="gnav" aria-label="Pisos"><div class="gnav-in"><b>Pisos</b><div class="gnav-r"><span class="gnav-towns">Blanes · Lloret · Palafolls · Mataró · Badalona</span><button class="favnav" id="favnav" type="button" aria-pressed="false" aria-label="Ver mis favoritos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg><span class="num" id="favnav-n">0</span></button></div></div></nav>
+<nav class="gnav" aria-label="Pisos"><div class="gnav-in"><b>Pisos</b><div class="gnav-r"><span class="gnav-towns">De Blanes a Barcelona</span><button class="favnav" id="favnav" type="button" aria-pressed="false" aria-label="Ver mis favoritos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg><span class="num" id="favnav-n">0</span></button></div></div></nav>
 
 <div class="wrap">
   <header>
     <span class="kicker">Nuevo cada mañana</span>
-    <h1>Tu próximo piso.<em>Venta y alquiler en Blanes, Lloret de Mar, Palafolls, Mataró y Badalona.</em></h1>
+    <h1>Tu próximo piso.<em>Venta y alquiler de Blanes a Barcelona: Blanes, Lloret, el Maresme, Badalona y Barcelona y alrededores.</em></h1>
     <p class="updated" id="updated">Cargando la última búsqueda…</p>
     <div class="search-now">
       <a class="btn main" id="search-now" href="https://claude.ai/" target="_blank" rel="noopener">Buscar ahora</a>
@@ -270,17 +272,13 @@ footer a{color:var(--link);text-decoration:none}
         </div>
         <button class="filter-btn" id="filter-toggle" aria-expanded="false" aria-controls="filters">Filtros <span class="dot num" id="filter-count" hidden>0</span></button>
       </div>
-      <div class="towns" role="group" aria-label="Municipio" id="towns">
-        <button class="chip" data-town="" aria-pressed="true">Todos <span class="n num" data-n=""></span></button>
-        <button class="chip" data-town="Blanes" aria-pressed="false">Blanes <span class="n num" data-n="Blanes"></span></button>
-        <button class="chip" data-town="Lloret de Mar" aria-pressed="false">Lloret <span class="n num" data-n="Lloret de Mar"></span></button>
-        <button class="chip" data-town="Palafolls" aria-pressed="false">Palafolls <span class="n num" data-n="Palafolls"></span></button>
-        <button class="chip" data-town="Mataró" aria-pressed="false">Mataró <span class="n num" data-n="Mataró"></span></button>
-        <button class="chip" data-town="Badalona" aria-pressed="false">Badalona <span class="n num" data-n="Badalona"></span></button>
-      </div>
+      <div class="towns" role="group" aria-label="Zona" id="regions"></div>
+      <div class="towns sub" role="group" aria-label="Municipio" id="towns" hidden></div>
       <div class="filters" id="filters" hidden>
         <div class="grid">
           <label class="field"><span class="label">Precio máximo</span><input id="f-price" type="number" inputmode="numeric" min="0" placeholder="Sin límite"></label>
+          <label class="field"><span class="label">Tipo</span>
+            <select id="f-tipo"><option value="">Pisos y casas</option><option value="piso">Solo pisos</option><option value="casa">Solo casas</option></select></label>
           <label class="field"><span class="label">Habitaciones</span>
             <select id="f-rooms"><option value="0">Cualquiera</option><option value="1">1 o más</option><option value="2">2 o más</option><option value="3">3 o más</option><option value="4">4 o más</option></select></label>
           <label class="field"><span class="label">Metros mínimos</span><input id="f-m2" type="number" inputmode="numeric" min="0" step="5" placeholder="Sin mínimo"></label>
@@ -308,7 +306,7 @@ footer a{color:var(--link);text-decoration:none}
         <label class="chip"><input type="checkbox" id="x-ascensor"> Ascensor</label>
         <label class="chip"><input type="checkbox" id="x-garaje"> Parking</label>
       </div>
-      <p class="note">Los extras solo se aplican en Idealista. En Badalona venta, Idealista abre el barrio exacto; en los demás portales elige el barrio en sus filtros.</p>
+      <p class="note">En venta se aplica tu tope de cada zona: 210.000 € en Barcelona y alrededores y 250.000 € en el resto. Los extras solo se aplican en Idealista. En Badalona venta, Idealista abre el barrio exacto; en los demás portales elige el barrio en sus filtros.</p>
       <div id="cards"></div>
     </div>
   </details>
@@ -329,8 +327,8 @@ footer a{color:var(--link);text-decoration:none}
     <summary><span>¿Está bien de precio?<span class="sub">Compara cualquier piso con la media de su zona</span></span></summary>
     <div class="tool-body">
       <div class="grid">
-        <label class="field"><span class="label" id="c-price-label">Precio (€)</span><input id="c-price" type="number" inputmode="numeric" min="0" value="219000"></label>
-        <label class="field"><span class="label">Superficie (m²)</span><input id="c-m2" type="number" inputmode="numeric" min="0" value="74"></label>
+        <label class="field"><span class="label" id="c-price-label">Precio (€)</span><input id="c-price" type="number" inputmode="numeric" min="0" value="199000"></label>
+        <label class="field"><span class="label">Superficie (m²)</span><input id="c-m2" type="number" inputmode="numeric" min="0" value="70"></label>
         <label class="field"><span class="label">Zona</span><select id="c-zone"></select></label>
       </div>
       <div class="calc-out" aria-live="polite">
@@ -340,11 +338,20 @@ footer a{color:var(--link);text-decoration:none}
     </div>
   </details>
 
-  <footer>Los anuncios se actualizan cada mañana a partir de una búsqueda automática, sobre todo de yaencontre y Habitaclia, porque Idealista, Fotocasa y pisos.com no dejan leerlos de forma automática. Medias de €/m² de Indomio, agosto de 2026: <a href="https://www.indomio.es/mercado-inmobiliario/cataluna/blanes/" target="_blank" rel="noopener">Blanes</a>, <a href="https://www.indomio.es/mercado-inmobiliario/cataluna/lloret-de-mar/" target="_blank" rel="noopener">Lloret de Mar</a> (septiembre), <a href="https://www.indomio.es/mercado-inmobiliario/cataluna/palafolls/" target="_blank" rel="noopener">Palafolls</a>, <a href="https://www.indomio.es/mercado-inmobiliario/cataluna/badalona/" target="_blank" rel="noopener">Badalona</a>; Mataró, de <a href="https://realadvisor.es/es/precios-viviendas/municipio-mataro" target="_blank" rel="noopener">RealAdvisor</a> (agosto).</footer>
+  <footer>Los anuncios se actualizan cada mañana a partir de una búsqueda automática en portales, inmobiliarias de la zona y webs de bancos. Medias de €/m²: <a href="https://www.indomio.es/mercado-inmobiliario/cataluna/blanes/" target="_blank" rel="noopener">Indomio</a> (Blanes, Palafolls y Badalona, agosto de 2026; Lloret, L'Hospitalet, El Masnou y Montgat, septiembre; Santa Coloma, julio; distritos de Barcelona), <a href="https://realadvisor.es/es/precios-viviendas/municipio-mataro" target="_blank" rel="noopener">RealAdvisor</a> (Mataró, agosto) e idealista (Barcelona ciudad, agosto). Donde no hay media publicada se usa la que guarda la búsqueda para cada anuncio.</footer>
 </div>
 
 <script>
-// Average €/m² (sale) and €/m²/month (rent), Indomio, Aug 2026
+/* ---------- Areas ---------- */
+const MAX_VENTA = 250000;
+const REGIONS = [
+  {id:'costa', name:'Blanes y Lloret', color:'var(--sea)'},
+  {id:'maresme', name:'Maresme', color:'var(--good)'},
+  {id:'badalona', name:'Badalona', color:'var(--coral)'},
+  {id:'bcn', name:'Barcelona y alrededores', short:'Barcelona y área', color:'var(--plum)', max:210000},
+  {id:'otros', name:'Otros', color:'var(--muted)'},
+];
+// Average €/m² (sale) and €/m²/month (rent)
 const ZONES = [
   {id:'blanes', town:'Blanes', name:'Blanes (media)', v:2489, a:10.78},
   {id:'blanes-pins', name:'Blanes · Els Pins', v:2463, a:11.10},
@@ -356,33 +363,62 @@ const ZONES = [
   {id:'lloret', town:'Lloret de Mar', name:'Lloret de Mar (media)', v:2628, a:16.05},
   {id:'palafolls', town:'Palafolls', name:'Palafolls (media)', v:2269, a:10.06},
   {id:'mataro', town:'Mataró', name:'Mataró (media)', v:2386, a:10.75},
+  {id:'masnou', town:'El Masnou', name:'El Masnou (media)', v:3353, a:14.52},
+  {id:'montgat', town:'Montgat', name:'Montgat (media)', v:3485, a:14.79},
   {id:'badalona', town:'Badalona', name:'Badalona (media)', v:2688, a:18.39},
   {id:'bdn-salut', name:'Badalona · La Salut', v:2263, a:11.89},
   {id:'bdn-lloreda', name:'Badalona · Lloreda', v:2561, a:16.08},
   {id:'bdn-sistrells', name:'Badalona · Nova Lloreda-Sistrells', v:2726, a:17.52},
   {id:'bdn-gorg', name:'Badalona · Gorg-Pep Ventura', v:3488, a:16.57},
   {id:'bdn-casagemes', name:'Badalona · Casagemes-Canyadó', v:3786, a:15.35},
+  {id:'santacoloma', town:'Santa Coloma de Gramenet', name:'Santa Coloma de Gramenet (media)', v:2328, a:19.5},
+  {id:'hospitalet', town:"L'Hospitalet de Llobregat", name:"L'Hospitalet de Llobregat (media)", v:2996, a:19.76},
+  {id:'bcn', town:'Barcelona', name:'Barcelona (media)', v:5440, a:20.1},
+  {id:'bcn-noubarris', name:'Barcelona · Nou Barris', v:3331, a:19.48},
+  {id:'bcn-santandreu', name:'Barcelona · Sant Andreu', v:3922, a:18.41},
+  {id:'bcn-santmarti', name:'Barcelona · Sant Martí', v:4883, a:24.97},
 ];
-const AREAS = {
-  venta: [
-    {town:'Blanes', name:'Blanes', zone:'blanes', idealista:'blanes-girona', slug:'blanes'},
-    {town:'Lloret de Mar', name:'Lloret de Mar', zone:'lloret', idealista:'lloret-de-mar-girona', slug:'lloret-de-mar', us:'lloret_de_mar'},
-    {town:'Palafolls', name:'Palafolls', zone:'palafolls', idealista:'palafolls-barcelona', slug:'palafolls'},
-    {town:'Mataró', name:'Mataró', zone:'mataro', idealista:'mataro-barcelona', slug:'mataro'},
-    {town:'Badalona', name:'Badalona · La Salut, Lloreda y Sistrells', zone:'bdn-sistrells', idealista:'badalona/la-salut-lloreda-sistrells', slug:'badalona'},
-    {town:'Badalona', name:'Badalona · Gorg y Pep Ventura', zone:'bdn-gorg', idealista:'badalona/gorg-pep-ventura', slug:'badalona'},
-    {town:'Badalona', name:'Badalona · Casagemes y Canyadó', zone:'bdn-casagemes', idealista:'badalona/casagemes-canyado', slug:'badalona'},
-  ],
-  alquiler: [
-    {town:'Blanes', name:'Blanes', zone:'blanes', idealista:'blanes-girona', slug:'blanes'},
-    {town:'Lloret de Mar', name:'Lloret de Mar', zone:'lloret', idealista:'lloret-de-mar-girona', slug:'lloret-de-mar', us:'lloret_de_mar'},
-    {town:'Palafolls', name:'Palafolls', zone:'palafolls', idealista:'palafolls-barcelona', slug:'palafolls'},
-    {town:'Mataró', name:'Mataró', zone:'mataro', idealista:'mataro-barcelona', slug:'mataro'},
-    {town:'Badalona', name:'Badalona', zone:'badalona', idealista:'badalona-barcelona', slug:'badalona'},
-  ]
-};
+// Municipios: the daily task writes "municipio" exactly as in "town"
+const TOWNS = [
+  {town:'Blanes', short:'Blanes', region:'costa', zone:'blanes', idealista:'blanes-girona', slug:'blanes'},
+  {town:'Lloret de Mar', short:'Lloret', region:'costa', zone:'lloret', idealista:'lloret-de-mar-girona', slug:'lloret-de-mar', us:'lloret_de_mar'},
+  {town:'Palafolls', short:'Palafolls', region:'maresme', zone:'palafolls', idealista:'palafolls-barcelona', slug:'palafolls'},
+  {town:'Mataró', short:'Mataró', region:'maresme', zone:'mataro', idealista:'mataro-barcelona', slug:'mataro'},
+  {town:'Vilassar de Mar', short:'Vilassar', region:'maresme', idealista:'vilassar-de-mar-barcelona', slug:'vilassar-de-mar', us:'vilassar_de_mar'},
+  {town:'Premià de Mar', short:'Premià', region:'maresme', idealista:'premia-de-mar-barcelona', slug:'premia-de-mar', us:'premia_de_mar'},
+  {town:'El Masnou', short:'El Masnou', region:'maresme', zone:'masnou', idealista:'el-masnou-barcelona', slug:'el-masnou', us:'el_masnou'},
+  {town:'Montgat', short:'Montgat', region:'maresme', zone:'montgat', idealista:'montgat-barcelona', slug:'montgat'},
+  {town:'Badalona', short:'Badalona', region:'badalona', zone:'badalona', idealista:'badalona-barcelona', slug:'badalona',
+    ventaAreas:[
+      {name:'Badalona · La Salut, Lloreda y Sistrells', zone:'bdn-sistrells', idealista:'badalona/la-salut-lloreda-sistrells'},
+      {name:'Badalona · Gorg y Pep Ventura', zone:'bdn-gorg', idealista:'badalona/gorg-pep-ventura'},
+      {name:'Badalona · Casagemes y Canyadó', zone:'bdn-casagemes', idealista:'badalona/casagemes-canyado'},
+    ]},
+  {town:'Sant Adrià de Besòs', short:'Sant Adrià', region:'bcn', idealista:'sant-adria-de-besos-barcelona', slug:'sant-adria-de-besos', us:'sant_adria_de_besos'},
+  {town:'Santa Coloma de Gramenet', short:'Santa Coloma', region:'bcn', zone:'santacoloma', idealista:'santa-coloma-de-gramenet-barcelona', slug:'santa-coloma-de-gramenet', us:'santa_coloma_de_gramenet'},
+  {town:'Barcelona', short:'Barcelona', region:'bcn', zone:'bcn', idealista:'barcelona-barcelona', slug:'barcelona', fc:'barcelona-capital', pc:'barcelona_capital'},
+  {town:"L'Hospitalet de Llobregat", short:"L'Hospitalet", region:'bcn', zone:'hospitalet', idealista:'l-hospitalet-de-llobregat-barcelona', slug:'l-hospitalet-de-llobregat', us:'l_hospitalet_de_llobregat'},
+  {town:'Cornellà de Llobregat', short:'Cornellà', region:'bcn', idealista:'cornella-de-llobregat-barcelona', slug:'cornella-de-llobregat', us:'cornella_de_llobregat'},
+  {town:'El Prat de Llobregat', short:'El Prat', region:'bcn', idealista:'el-prat-de-llobregat-barcelona', slug:'el-prat-de-llobregat', us:'el_prat_de_llobregat'},
+];
+const TOWN_BY = Object.fromEntries(TOWNS.map(t => [t.town, t]));
+const regionOfTown = name => (TOWN_BY[name] && TOWN_BY[name].region) || 'otros';
+const regionById = id => REGIONS.find(r => r.id === id);
+const capFor = (op, town) => op !== 'venta' ? 0 : ((regionById(regionOfTown(town)) || {}).max || MAX_VENTA);
 
-const DEFAULTS = {mode:'venta', town:'', price:{venta:250000, alquiler:0}, rooms:0, m2:0, sort:'best', fav:false, hide:true, terraza:false, ascensor:false, garaje:false};
+function portalAreas(){
+  const towns = TOWNS.filter(t => (!S.region || t.region === S.region) && (!S.town || t.town === S.town));
+  return towns.flatMap(t => S.mode === 'venta' && t.ventaAreas
+    ? t.ventaAreas.map(a => Object.assign({}, t, a))
+    : [Object.assign({name:t.town}, t)]);
+}
+// Price for portal links: your filter, never above the zone's budget cap
+function priceFor(a){
+  const p = S.price[S.mode] || 0, cap = capFor(S.mode, a.town);
+  return p && cap ? Math.min(p, cap) : (p || cap);
+}
+
+const DEFAULTS = {mode:'venta', region:'', town:'', tipo:'', price:{venta:250000, alquiler:0}, rooms:0, m2:0, sort:'best', fav:false, hide:true, terraza:false, ascensor:false, garaje:false};
 let S = load();
 function load(){
   try{
@@ -390,7 +426,9 @@ function load(){
     if(s && s.price){
       // Budget cap of 250.000 € (Oct 2026): apply once to saved filters that had no price limit
       if(!localStorage.getItem('pisos-tope-250')){ if(!s.price.venta) s.price.venta = 250000; localStorage.setItem('pisos-tope-250', '1'); }
-      return Object.assign({}, DEFAULTS, s);
+      const out = Object.assign({}, DEFAULTS, s);
+      if(out.town && !out.region) out.region = regionOfTown(out.town);
+      return out;
     }
   }catch(e){}
   return JSON.parse(JSON.stringify(DEFAULTS));
@@ -398,7 +436,7 @@ function load(){
 function save(){ try{ localStorage.setItem('pisos-filtros-v2', JSON.stringify(S)); }catch(e){} }
 
 const $ = id => document.getElementById(id);
-const fmt = (n, d = 0) => n.toLocaleString('es-ES', {maximumFractionDigits: d, minimumFractionDigits: 0});
+const fmt = (n, d = 0) => (typeof n === 'number' && isFinite(n)) ? n.toLocaleString('es-ES', {maximumFractionDigits: d, minimumFractionDigits: 0}) : '—';
 const zoneById = id => ZONES.find(z => z.id === id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const safeUrl = u => /^https:\/\//.test(u || '') ? u : '';
@@ -446,16 +484,19 @@ function fecha(iso, est){
 }
 
 function baseMatch(l){
-  const p = S.price[S.mode];
+  const p = S.price[S.mode], cap = capFor(l.op, l.municipio);
   return l.op === S.mode
+    && (!cap || !l.precio || l.precio <= cap)
     && (!p || !l.precio || l.precio <= p)
+    && (!S.tipo || (l.tipo || 'piso') === S.tipo)
     && (!S.rooms || !l.hab || l.hab >= S.rooms)
     && (!S.m2 || !l.m2 || l.m2 >= S.m2)
     && (!S.fav || l.marca === 'fav')
     && (!S.hide || l.marca !== 'descartado');
 }
+const areaMatch = l => (!S.region || regionOfTown(l.municipio) === S.region) && (!S.town || l.municipio === S.town);
 function visible(){
-  const list = LISTINGS.filter(l => baseMatch(l) && (!S.town || l.municipio === S.town));
+  const list = LISTINGS.filter(l => baseMatch(l) && areaMatch(l));
   const by = {
     best: (a, b) => (a.top || 99) - (b.top || 99) || (diffFor(a) ?? 999) - (diffFor(b) ?? 999),
     new: (a, b) => String(b.publicado || '').localeCompare(String(a.publicado || '')),
@@ -477,9 +518,9 @@ function flatHTML(l, i){
   return `<article class="flat${firstPaint ? ' enter' : ''}${dis ? ' dim' : ''}" style="--i:${Math.min(i, 8)}">
     <div class="flat-head">
       <div>
-        ${(l.top || isNew(l) || drop(l)) ? `<div class="tags">${isNew(l) ? '<span class="tag new">Nuevo</span>' : ''}${drop(l) ? `<span class="tag down">Ha bajado ${fmt(drop(l))} €</span>` : ''}${l.top ? `<span class="badge">Top ${l.top} de hoy</span>` : ''}</div>` : ''}
-        <div class="where">${esc(l.municipio)}${l.zona ? ' · ' + esc(l.zona) : ''}</div>
-        <h3>${esc(l.titulo || 'Piso')}</h3>
+        ${(l.top || isNew(l) || drop(l)) ? `<div class="tags">${isNew(l) ? '<span class="tag new">Nuevo</span>' : ''}${drop(l) ? `<span class="tag down">Ha bajado ${fmt(drop(l))} €</span>` : ''}${l.top && l.op === S.mode ? `<span class="badge">Top ${l.top} de hoy</span>` : ''}</div>` : ''}
+        <div class="where">${l.tipo === 'casa' ? 'Casa · ' : ''}${esc(l.municipio)}${l.zona ? ' · ' + esc(l.zona) : ''}</div>
+        <h3>${esc(l.titulo || 'Vivienda')}</h3>
       </div>
       <div class="price">${l.precio ? fmt(l.precio) + ' €' : '—'}${rent ? '<small>al mes</small>' : ''}${drop(l) ? `<s class="was">${fmt(l.precioAnterior)} €</s>` : ''}</div>
     </div>
@@ -500,32 +541,35 @@ function flatHTML(l, i){
 
 function renderFeed(){
   const feed = $('feed');
-  $('feed-title').textContent = (S.fav ? 'Tus favoritos' : 'Pisos') + (S.mode === 'venta' ? ' en venta' : ' en alquiler');
+  const where = S.town ? ` en ${S.town}` : S.region ? ` · ${regionById(S.region).name}` : '';
+  $('feed-title').textContent = (S.fav ? 'Tus favoritos' : 'Pisos') + (S.mode === 'venta' ? ' en venta' : ' en alquiler') + where;
   if(dbState === 'loading'){ feed.innerHTML = '<div class="empty"><b>Cargando pisos…</b></div>'; $('count').textContent = ''; return; }
   if(dbState === 'off'){ feed.innerHTML = '<div class="empty"><b>No se pueden cargar los pisos aquí</b><span>Vuelve a cargar la página.</span></div>'; $('count').textContent = ''; return; }
   const list = visible();
-  const total = LISTINGS.filter(l => l.op === S.mode).length;
+  const total = LISTINGS.filter(l => l.op === S.mode && areaMatch(l)).length;
   $('count').textContent = `${list.length} de ${total}`;
   if(!LISTINGS.length){ feed.innerHTML = '<div class="empty"><b>Todavía no hay pisos</b><span>Aparecerán aquí después de la próxima búsqueda de la mañana.</span></div>'; return; }
   if(!list.length){
     feed.innerHTML = total
       ? '<div class="empty"><b>Ningún piso cumple estos filtros</b><button class="btn" type="button" data-reset>Quitar filtros</button></div>'
-      : `<div class="empty"><b>${S.mode === 'alquiler' ? 'No hay alquileres' : 'No hay pisos en venta'} en el último informe</b></div>`;
+      : S.region === 'bcn'
+        ? '<div class="empty"><b>Aún no hay pisos de Barcelona y alrededores</b><span>La búsqueda de la mañana los incluye desde el 24 de noviembre, con tope de 210.000 € en venta.</span></div>'
+        : `<div class="empty"><b>${S.mode === 'alquiler' ? 'No hay alquileres' : 'No hay pisos en venta'} aquí en el último informe</b></div>`;
     return;
   }
   feed.innerHTML = list.map(flatHTML).join('');
 }
 
 function renderTop(){
-  const tops = LISTINGS.filter(l => l.top).sort((a, b) => a.top - b.top).slice(0, 3);
+  const tops = LISTINGS.filter(l => l.top && l.op === S.mode && l.marca !== 'descartado').sort((a, b) => a.top - b.top).slice(0, 3);
   $('top-sec').hidden = !tops.length;
   $('rail').innerHTML = tops.map(l => {
     const d = diffFor(l), url = safeUrl(l.url);
     return `<a class="topcard" href="${esc(url) || '#'}" target="_blank" rel="noopener">
       <span class="rank">Top ${l.top}</span>
       <span class="p">${fmt(l.precio)} €${drop(l) ? ` <s class="was">${fmt(l.precioAnterior)} €</s>` : ''}</span>
-      <span class="t">${esc(l.titulo)}</span>
-      <span class="z">${esc(l.municipio)} · ${esc(l.zona || '')} · <span class="num">${fmt(l.m2)} m²</span></span>
+      <span class="t">${esc(l.titulo || 'Vivienda')}</span>
+      <span class="z">${[esc(l.municipio), l.zona ? esc(l.zona) : '', l.m2 ? `<span class="num">${fmt(l.m2)} m²</span>` : ''].filter(Boolean).join(' · ')}</span>
       ${d != null ? `<span class="d">${verdictText(d)}</span>` : ''}
     </a>`;
   }).join('');
@@ -541,11 +585,24 @@ function renderStats(){
   $('favnav-n').textContent = LISTINGS.filter(l => l.marca === 'fav').length;
   $('favnav').setAttribute('aria-pressed', String(!!S.fav));
   $('favnav').setAttribute('aria-label', S.fav ? 'Ver todos los pisos' : 'Ver mis favoritos');
-  for(const n of document.querySelectorAll('#towns [data-n]')){
-    const t = n.dataset.n;
-    n.textContent = dbState === 'ok' ? LISTINGS.filter(l => baseMatch(l) && (!t || l.municipio === t)).length : '';
-  }
+  renderAreaChips();
 }
+function inModeCount(pred){ return LISTINGS.filter(l => baseMatch(l) && pred(l)).length; }
+function renderAreaChips(){
+  const ok = dbState === 'ok';
+  const n = pred => ok ? inModeCount(pred) : '';
+  const regs = REGIONS.filter(r => r.id !== 'otros' || (ok && inModeCount(l => regionOfTown(l.municipio) === 'otros')));
+  $('regions').innerHTML = `<button class="chip" data-region="" aria-pressed="${!S.region}">Todas <span class="n num">${n(() => true)}</span></button>` +
+    regs.map(r => `<button class="chip" data-region="${r.id}" aria-pressed="${S.region === r.id}">${esc(r.name)} <span class="n num">${n(l => regionOfTown(l.municipio) === r.id)}</span>${r.max && S.mode === 'venta' ? `<span class="cap">≤${fmt(r.max / 1000)}k</span>` : ''}</button>`).join('');
+  let towns = S.region ? TOWNS.filter(t => t.region === S.region).map(t => ({town:t.town, short:t.short})) : [];
+  if(S.region === 'otros') towns = [...new Set(LISTINGS.filter(l => regionOfTown(l.municipio) === 'otros').map(l => l.municipio))].map(t => ({town:t, short:t}));
+  $('towns').hidden = towns.length < 2;
+  $('towns').innerHTML = towns.length < 2 ? '' :
+    `<button class="chip" data-town="" aria-pressed="${!S.town}">Todos</button>` +
+    towns.map(t => `<button class="chip" data-town="${esc(t.town)}" aria-pressed="${S.town === t.town}">${esc(t.short)} <span class="n num">${n(l => l.municipio === t.town)}</span></button>`).join('');
+}
+
+
 
 function renderInforme(){
   if(!INFORME){ $('updated').textContent = 'Los pisos que encuentra tu tarea de cada mañana, todos aquí.'; return; }
@@ -559,6 +616,10 @@ function renderInforme(){
 
 document.addEventListener('click', async e => {
   if(e.target.closest('[data-reset]')){ resetFilters(); return; }
+  const rc = e.target.closest('#regions [data-region]');
+  if(rc){ S.region = rc.dataset.region; S.town = ''; refresh(); return; }
+  const tc = e.target.closest('#towns [data-town]');
+  if(tc){ S.town = tc.dataset.town; refresh(); return; }
   const b = e.target.closest('button[data-mark]');
   if(!b) return;
   const l = LISTINGS.find(x => x.id === b.dataset.id);
@@ -645,7 +706,7 @@ $('lock-form').addEventListener('submit', async e => {
 const ROOMS = {1:'un-dormitorio', 2:'de-dos-dormitorios', 3:'de-tres-dormitorios', 4:'de-cuatro-cinco-habitaciones-o-mas'};
 function idealistaURL(a){
   const op = S.mode === 'venta' ? 'venta-viviendas' : 'alquiler-viviendas';
-  const f = [], p = S.price[S.mode];
+  const f = [], p = priceFor(a);
   if(p > 0) f.push('precio-hasta_' + p);
   if(S.m2 > 0) f.push('metros-cuadrados-mas-de_' + S.m2);
   if(S.rooms > 0) for(let r = S.rooms; r <= 4; r++) f.push(ROOMS[r]);
@@ -655,21 +716,22 @@ function idealistaURL(a){
   return `https://www.idealista.com/${op}/${a.idealista}/${f.length ? 'con-' + f.join(',') + '/' : ''}?ordenado-por=fecha-publicacion-desc`;
 }
 function fotocasaURL(a){
-  const q = new URLSearchParams({sortType:'publicationDate'}), p = S.price[S.mode];
+  const q = new URLSearchParams({sortType:'publicationDate'}), p = priceFor(a);
   if(p > 0) q.set('maxPrice', p);
   if(S.rooms > 0) q.set('minRooms', S.rooms);
   if(S.m2 > 0) q.set('minSurface', S.m2);
-  return `https://www.fotocasa.es/es/${S.mode === 'venta' ? 'comprar' : 'alquiler'}/viviendas/${a.slug}/todas-las-zonas/l?${q}`;
+  return `https://www.fotocasa.es/es/${S.mode === 'venta' ? 'comprar' : 'alquiler'}/viviendas/${a.fc || a.slug}/todas-las-zonas/l?${q}`;
 }
 const habitacliaURL = a => S.mode === 'venta' ? `https://www.habitaclia.com/viviendas-${a.us || a.slug}.htm` : `https://www.habitaclia.com/alquiler-${a.us || a.slug}.htm`;
-const pisosURL = a => `https://www.pisos.com/${S.mode}/pisos-${a.us || a.slug}/`;
+const pisosURL = a => `https://www.pisos.com/${S.mode}/pisos-${a.pc || a.us || a.slug}/`;
 const yaURL = a => `https://www.yaencontre.com/${S.mode}/pisos/${a.slug}/o-recientes`;
 
 function renderCards(){
-  $('cards').innerHTML = AREAS[S.mode].filter(a => !S.town || a.town === S.town).map(a => {
-    const z = zoneById(a.zone);
-    const avg = S.mode === 'venta' ? `media ${fmt(z.v)} €/m²` : `media ${fmt(z.a, 2)} €/m² al mes`;
-    return `<div class="portal"><div class="portal-head"><b>${a.name}</b><span class="num">${avg}</span></div>
+  $('cards').innerHTML = portalAreas().map(a => {
+    const z = a.zone ? zoneById(a.zone) : null;
+    const avg = !z ? '' : S.mode === 'venta' ? `media ${fmt(z.v)} €/m²` : `media ${fmt(z.a, 2)} €/m² al mes`;
+    const cap = S.mode === 'venta' ? ` · hasta ${fmt(priceFor(a))} €` : '';
+    return `<div class="portal"><div class="portal-head"><b>${esc(a.name)}</b><span class="num">${avg}${cap}</span></div>
       <div class="links">
         <a class="btn main" href="${idealistaURL(a)}" target="_blank" rel="noopener">Idealista</a>
         <a class="btn" href="${fotocasaURL(a)}" target="_blank" rel="noopener">Fotocasa</a>
@@ -683,7 +745,7 @@ function renderCards(){
 /* ---------- Calculator ---------- */
 function renderZones(){
   const sel = $('c-zone'), cur = sel.value || 'bdn-gorg';
-  sel.innerHTML = ZONES.map(z => `<option value="${z.id}">${z.name}</option>`).join('');
+  sel.innerHTML = ZONES.map(z => `<option value="${z.id}">${esc(z.name)}</option>`).join('');
   sel.value = zoneById(cur) ? cur : 'blanes';
   $('c-price-label').textContent = S.mode === 'venta' ? 'Precio (€)' : 'Alquiler al mes (€)';
 }
@@ -696,13 +758,13 @@ function renderCalc(){
 }
 
 /* ---------- Filters ---------- */
-function activeFilters(){ return [S.price[S.mode] > 0, S.rooms > 0, S.m2 > 0, S.fav, S.sort !== 'best'].filter(Boolean).length; }
+function activeFilters(){ return [S.price[S.mode] > 0, !!S.tipo, S.rooms > 0, S.m2 > 0, S.fav, S.sort !== 'best'].filter(Boolean).length; }
 function renderFilters(){
   for(const b of document.querySelectorAll('.seg button')) b.setAttribute('aria-pressed', b.dataset.mode === S.mode);
-  for(const b of document.querySelectorAll('#towns .chip')) b.setAttribute('aria-pressed', b.dataset.town === S.town);
   $('f-price').value = S.price[S.mode] || '';
   $('f-price').step = S.mode === 'venta' ? 5000 : 50;
   $('f-price').placeholder = S.mode === 'venta' ? 'Sin límite (€)' : 'Sin límite (€/mes)';
+  $('f-tipo').value = S.tipo;
   $('f-rooms').value = S.rooms;
   $('f-m2').value = S.m2 || '';
   $('f-sort').value = S.sort;
@@ -715,7 +777,7 @@ function renderFilters(){
 }
 function refresh(){ save(); renderFilters(); renderData(); renderCards(); }
 function resetFilters(){
-  Object.assign(S, {town:'', rooms:0, m2:0, sort:'best', fav:false});
+  Object.assign(S, {region:'', town:'', tipo:'', rooms:0, m2:0, sort:'best', fav:false});
   S.price[S.mode] = 0;
   refresh();
 }
@@ -726,10 +788,9 @@ for(const b of document.querySelectorAll('.seg button')) b.addEventListener('cli
   S.mode = b.dataset.mode;
   const cp = $('c-price');
   if(S.mode === 'alquiler' && +cp.value > 20000) cp.value = 950;
-  if(S.mode === 'venta' && +cp.value < 20000) cp.value = 219000;
+  if(S.mode === 'venta' && +cp.value < 20000) cp.value = 199000;
   save(); renderAll();
 });
-for(const b of document.querySelectorAll('#towns .chip')) b.addEventListener('click', () => { S.town = b.dataset.town; refresh(); });
 $('filter-toggle').addEventListener('click', () => {
   const f = $('filters'), open = f.hidden;
   f.hidden = !open;
@@ -738,13 +799,14 @@ $('filter-toggle').addEventListener('click', () => {
 $('f-reset').addEventListener('click', resetFilters);
 $('f-price').addEventListener('input', e => { S.price[S.mode] = +e.target.value || 0; save(); renderData(); renderCards(); renderFilterCount(); });
 $('f-m2').addEventListener('input', e => { S.m2 = +e.target.value || 0; save(); renderData(); renderCards(); renderFilterCount(); });
+$('f-tipo').addEventListener('change', e => { S.tipo = e.target.value; refresh(); });
 $('f-rooms').addEventListener('change', e => { S.rooms = +e.target.value; refresh(); });
 $('f-sort').addEventListener('change', e => { S.sort = e.target.value; refresh(); });
 $('f-fav').addEventListener('change', e => { S.fav = e.target.checked; refresh(); });
 // Star in the top bar: jump straight to the favorites (switching to venta/alquiler if they are all in the other one).
 $('favnav').addEventListener('click', () => {
   if(S.fav){ S.fav = false; refresh(); return; }
-  S.fav = true; S.town = '';
+  S.fav = true; S.region = ''; S.town = '';
   const favs = LISTINGS.filter(l => l.marca === 'fav');
   if(favs.length && !favs.some(l => l.op === S.mode)) S.mode = favs[0].op;
   refresh();
